@@ -24,7 +24,7 @@
 | 원본 파일 | 넣을 이름 | 쪽수 |
 | --- | --- | --- |
 | `1부 고유어.PDF` | `public/books/book1-goyueo.pdf` | 17 |
-| `2부 방언.PDF` | `public/books/book2-jiyeogeo.pdf` | 15 |
+| `2부 방언.PDF` | `public/books/book2-jiyeogeo.pdf` | 14 (원본 1쪽 삭제됨) |
 | `3부 현대어.PDF` | `public/books/book3-hyundaeeo.pdf` | 17 |
 
 > 한글 파일명과 공백은 배포 환경에 따라 경로 오류를 일으키므로 영문 이름으로 정리합니다.
@@ -103,6 +103,18 @@ npm run preview  # 빌드 결과 미리보기
 - `일반 모드` 버튼 또는 `Esc` 로 복귀
 
 별도 비밀번호 없이 화면 모드만 바뀝니다.
+
+## 사전에서 특정 쪽 지우기
+
+원본에 잘못 들어간 쪽(빈 템플릿, 중복 등)을 영구히 빼야 할 때:
+
+```bash
+node scripts/_remove-page.mjs book2-jiyeogeo.pdf 1   # 1쪽 삭제, 나머지는 그대로 당겨짐
+npm run check:pdf                                     # 바뀐 쪽수 확인
+```
+
+스크립트를 돌리기 전에 원본을 반드시 `originals/`(배포에 포함되지 않음)에 따로 복사해 두세요.
+쪽을 지운 뒤에는 `src/data/books.js`와 `scripts/check-pdfs.mjs`의 `expectedPages`/`pages` 값도 함께 고쳐야 합니다.
 
 ## 폴더 구조
 

@@ -26,7 +26,7 @@ export const BOOKS = [
     question: '지역마다 다른 말에는 어떤 생활과 문화가 담겨 있을까?',
     concept: '그 지역 사람들의 생각, 문화, 정체성',
     file: 'book2-jiyeogeo.pdf',
-    expectedPages: 15,
+    expectedPages: 14,
     accent: '#5A7D66',
     accentSoft: '#E9F0EA',
     scaffoldId: 'story-jiyeogeo',
