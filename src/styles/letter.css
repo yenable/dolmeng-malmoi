@@ -1,3 +1,16 @@
+/* ── 작성 중 화면: 왼쪽 가이드 / 오른쪽 작성 폼, 한 화면에 들어오도록 2단 구성 ── */
+.letter-stage {
+  max-width: 1180px;
+  margin: 56px auto 0;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 30px 30px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* 제출 완료 카드(좁게 중앙 정렬) */
 .letter-wrap {
   max-width: 640px;
   margin: 64px auto 0;
@@ -11,7 +24,7 @@
 
 .letter-head {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 .letter-head h2 {
   margin-top: 14px;
@@ -27,11 +40,49 @@
   line-height: 1.6;
 }
 
-.letter-form {
-  margin-top: 26px;
+.letter-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.letter-guide-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  max-height: min(66vh, 620px);
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+.letter-guide-col .core-q {
+  margin-top: 0;
+}
+
+.letter-form-col {
+  display: flex;
+  min-width: 0;
+}
+
+.letter-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.letter-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.letter-form .letter-body textarea {
+  flex: 1;
+  min-height: 160px;
+  resize: none;
 }
 
 .letter-row {
@@ -125,6 +176,24 @@
 }
 .letter-reset {
   margin-top: 22px;
+}
+
+@media (max-width: 900px) {
+  .letter-stage {
+    margin-top: 44px;
+    padding: 22px 18px 26px;
+  }
+  .letter-split {
+    grid-template-columns: 1fr;
+  }
+  .letter-guide-col {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+  .letter-form .letter-body textarea {
+    min-height: 220px;
+  }
 }
 
 @media (max-width: 560px) {

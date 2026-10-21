@@ -3,9 +3,13 @@
   min-height: 100%;
   position: relative;
 }
-.admin-inner,
-.board-inner {
+.admin-inner {
   max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+.board-inner {
+  max-width: 1280px;
   margin: 0 auto;
   padding: 36px 24px 80px;
 }
@@ -45,6 +49,17 @@
   margin-top: 10px;
   font-size: 14.5px;
   color: var(--ink-soft);
+}
+.board-admin-badge {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6a5212;
+  background: var(--accent-soft);
+  border: 1px solid #ecd79a;
+  border-radius: 999px;
+  padding: 5px 14px;
 }
 
 .admin-gate {
@@ -136,58 +151,77 @@
   gap: 8px;
 }
 
-/* ── 공개 보드 ─────────────────────────── */
-.board-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.board-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.board-card-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  background: transparent;
-  border: 0;
-  padding: 18px 20px;
-  text-align: left;
-}
-.board-card-btn:hover {
-  background: var(--paper-deep);
-}
+/* ── 공개 보드: 패들렛처럼 내용이 바로 보이는 벽돌형 카드 ─────────────────────────── */
 .board-who {
   font-size: 12.5px;
   font-weight: 700;
   color: var(--ink-faint);
-}
-.board-card h2 {
-  margin-top: 4px;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
 }
 .board-date {
   font-size: 12.5px;
   color: var(--ink-faint);
   white-space: nowrap;
 }
-.board-text {
-  font-size: 14.5px;
-  line-height: 1.8;
+
+.board-wall {
+  margin-top: 24px;
+  column-count: 1;
+  column-gap: 18px;
+}
+@media (min-width: 640px) {
+  .board-wall {
+    column-count: 2;
+  }
+}
+@media (min-width: 980px) {
+  .board-wall {
+    column-count: 3;
+  }
+}
+
+.wall-card {
+  break-inside: avoid;
+  margin-bottom: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.wall-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.wall-card h2 {
+  margin-top: 4px;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+.wall-text {
+  font-size: 14px;
+  line-height: 1.75;
   color: var(--ink);
   white-space: pre-wrap;
-  padding: 0 20px 22px;
-  border-top: 1px solid var(--line);
-  margin-top: 0;
-  padding-top: 16px;
+}
+.wall-delete {
+  margin-top: 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #a13a3a;
+}
+.wall-delete:hover:not(:disabled) {
+  background: #fbeceb;
+  border-color: #f0c6c3;
+}
+.wall-delete:disabled {
+  opacity: 0.5;
 }

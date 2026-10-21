@@ -71,112 +71,123 @@ export default function LetterWriter() {
   }
 
   return (
-    <section className="letter-wrap" aria-labelledby="letter-h">
+    <section className="letter-stage" aria-labelledby="letter-h">
       <div className="letter-head">
         <span className="eyebrow">마지막 쪽 쓰기</span>
         <h2 id="letter-h">{LETTER_SCAFFOLD.title}</h2>
         <p className="letter-guide">{LETTER_SCAFFOLD.guide}</p>
       </div>
 
-      <div className="core-q">
-        <span className="q-mark">핵심 질문</span>
-        <p>{LETTER_SCAFFOLD.core}</p>
-      </div>
+      <div className="letter-split">
+        <div className="letter-guide-col">
+          <div className="core-q">
+            <span className="q-mark">핵심 질문</span>
+            <p>{LETTER_SCAFFOLD.core}</p>
+          </div>
 
-      <Disc title="단계별로 생각하기">
-        <div className="steps-list">
-          {LETTER_SCAFFOLD.steps.map((s) => (
-            <div className="step-card" key={s.n}>
-              <span className="lab">
-                {s.n}단계 · {s.label}
-              </span>
-              <p>{s.text}</p>
+          <Disc title="단계별로 생각하기" defaultOpen>
+            <div className="steps-list">
+              {LETTER_SCAFFOLD.steps.map((s) => (
+                <div className="step-card" key={s.n}>
+                  <span className="lab">
+                    {s.n}단계 · {s.label}
+                  </span>
+                  <p>{s.text}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </Disc>
+          </Disc>
 
-      <Disc title="생각 키워드 보기">
-        <div className="keywords">
-          {LETTER_SCAFFOLD.keywords.map((k) => (
-            <span className="kw" key={k}>
-              {k}
-            </span>
-          ))}
-        </div>
-      </Disc>
-
-      <Disc title="문장 틀 보기">
-        <div className="frames">
-          {LETTER_SCAFFOLD.frames.map((f, i) => (
-            <p className="frame" key={i}>
-              {f.split('______').map((part, j, arr) => (
-                <span key={j}>
-                  {part}
-                  {j < arr.length - 1 && <span className="blank">______</span>}
+          <Disc title="생각 키워드 보기">
+            <div className="keywords">
+              {LETTER_SCAFFOLD.keywords.map((k) => (
+                <span className="kw" key={k}>
+                  {k}
                 </span>
               ))}
-            </p>
-          ))}
-        </div>
-      </Disc>
+            </div>
+          </Disc>
 
-      <p className="caution">
-        <b>잠깐!</b> {LETTER_SCAFFOLD.caution}
-      </p>
+          <Disc title="문장 틀 보기">
+            <div className="frames">
+              {LETTER_SCAFFOLD.frames.map((f, i) => (
+                <p className="frame" key={i}>
+                  {f.split('______').map((part, j, arr) => (
+                    <span key={j}>
+                      {part}
+                      {j < arr.length - 1 && <span className="blank">______</span>}
+                    </span>
+                  ))}
+                </p>
+              ))}
+            </div>
+          </Disc>
 
-      <form className="letter-form" onSubmit={handleSubmit}>
-        <div className="letter-row">
-          <label>
-            이름
-            <input type="text" maxLength={20} required autoComplete="off" {...field('name')} />
-          </label>
-          <label>
-            번호
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              required
-              autoComplete="off"
-              {...field('number')}
-            />
-          </label>
-        </div>
-
-        <label className="letter-title">
-          제목
-          <input type="text" maxLength={60} required autoComplete="off" {...field('title')} />
-        </label>
-
-        <label className="letter-body">
-          <span className="letter-body-label">
-            2056년 친구들에게 쓰는 글
-            <span className={`letter-counter ${chars >= MIN_CHARS ? 'ok' : ''}`}>
-              {chars} / {MIN_CHARS}자 이상
-            </span>
-          </span>
-          <textarea
-            rows={12}
-            required
-            placeholder="위 질문과 문장 틀을 참고해서 2056년 어린이들에게 들려줄 이야기를 써 보세요."
-            {...field('text')}
-          />
-        </label>
-
-        {error && <p className="letter-error">{error}</p>}
-
-        <div className="letter-submit-row">
-          <p className="letter-hint">
-            {ready
-              ? '제출 준비가 되었어요. 제출 후에는 고치실 수 없으니 다시 한번 읽어 보세요.'
-              : `이름·번호·제목을 채우고 ${MIN_CHARS}자 이상 써야 제출할 수 있어요.`}
+          <p className="caution">
+            <b>잠깐!</b> {LETTER_SCAFFOLD.caution}
           </p>
-          <button type="submit" className="btn solid" disabled={!ready || submitting}>
-            {submitting ? '제출하는 중…' : '선생님께 제출하기'}
-          </button>
         </div>
-      </form>
+
+        <div className="letter-form-col">
+          <form className="letter-form" onSubmit={handleSubmit}>
+            <div className="letter-row">
+              <label>
+                이름
+                <input
+                  type="text"
+                  maxLength={20}
+                  required
+                  autoComplete="off"
+                  {...field('name')}
+                />
+              </label>
+              <label>
+                번호
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  required
+                  autoComplete="off"
+                  {...field('number')}
+                />
+              </label>
+            </div>
+
+            <label className="letter-title">
+              제목
+              <input type="text" maxLength={60} required autoComplete="off" {...field('title')} />
+            </label>
+
+            <label className="letter-body">
+              <span className="letter-body-label">
+                2056년 친구들에게 쓰는 글
+                <span className={`letter-counter ${chars >= MIN_CHARS ? 'ok' : ''}`}>
+                  {chars} / {MIN_CHARS}자 이상
+                </span>
+              </span>
+              <textarea
+                required
+                placeholder="왼쪽 질문과 문장 틀을 참고해서 2056년 어린이들에게 들려줄 이야기를 써 보세요."
+                {...field('text')}
+              />
+            </label>
+
+            {error && <p className="letter-error">{error}</p>}
+
+            <div className="letter-submit-row">
+              <p className="letter-hint">
+                {ready
+                  ? '제출 준비가 되었어요. 제출 후에는 고치실 수 없으니 다시 한번 읽어 보세요.'
+                  : `이름·번호·제목을 채우고 ${MIN_CHARS}자 이상 써야 제출할 수 있어요.`}
+              </p>
+              <button type="submit" className="btn solid" disabled={!ready || submitting}>
+                {submitting ? '제출하는 중…' : '선생님께 제출하기'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </section>
   )
 }
