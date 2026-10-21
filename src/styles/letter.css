@@ -69,6 +69,43 @@
 .letter-guide-col .core-q {
   margin-top: 0;
 }
+
+.my-answers {
+  border: 1px solid #ecd79a;
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 14px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.my-answers .eyebrow {
+  color: #6a5212;
+}
+.my-answers-book-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #4a3c10;
+}
+.my-answers-book ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.my-answers-book li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5a4a18;
+}
+.my-answers-book li span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a6c16;
+}
 /* .disc는 overflow:hidden이라 flex가 내용 대신 박스 자체를 쪼그라뜨릴 수 있다.
    자식들의 원래 크기를 지켜서 컬럼이 늘어나 스크롤되도록 고정한다. */
 .letter-guide-col > * {

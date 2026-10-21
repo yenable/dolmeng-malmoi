@@ -1,8 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
-import { LETTER_SCAFFOLD } from '../data/scaffolds.js'
+import { LETTER_SCAFFOLD, ACTIVITIES } from '../data/scaffolds.js'
+import { BOOKS } from '../data/books.js'
 import { useStore, setLetterDraft, markLetterSubmitted, resetLetter } from '../lib/storage.js'
 import { submitLetter, countChars, MIN_CHARS } from '../lib/letters.js'
 import { IconCaret } from './Icons.jsx'
+
+/** 사전별 위저드에서 적어 둔 답을 그대로 보여 준다. 참고용이며 여기서는 고칠 수 없다. */
+function MyAnswers({ storyAnswers }) {
+  const filled = BOOKS.filter((b) => storyAnswers[b.id]?.word?.trim())
+  if (filled.length === 0) return null
+
+  return (
+    <div className="my-answers">
+      <span className="eyebrow">내가 적어 둔 답</span>
+      {filled.map((b) => {
+        const a = storyAnswers[b.id]
+        const act = ACTIVITIES.find((x) => x.bookId === b.id)
+        return (
+          <div className="my-answers-book" key={b.id}>
+            <p className="my-answers-book-title">
+              {b.title} · <b>{a.word}</b>
+            </p>
+            <ul>
+              {act?.steps?.map((s, i) => {
+                const val = a[`s${i + 1}`]
+                if (!val?.trim()) return null
+                return (
+                  <li key={s.n}>
+                    <span>{s.label}</span>
+                    {val}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function Disc({ title, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen)
@@ -159,6 +195,8 @@ export default function LetterWriter() {
 
       <div className="letter-split">
         <GuideScroller>
+          <MyAnswers storyAnswers={store.storyAnswers} />
+
           <div className="core-q">
             <span className="q-mark">핵심 질문</span>
             <p>{LETTER_SCAFFOLD.core}</p>

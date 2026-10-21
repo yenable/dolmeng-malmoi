@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BOOKS } from '../data/books.js'
+import { BOOKS, isBookUnlocked } from '../data/books.js'
 import { ACTIVITIES } from '../data/scaffolds.js'
 import { useStore } from '../lib/storage.js'
 import Splash from './Splash.jsx'
+import { IconLock } from './Icons.jsx'
 
 const SPLASH_KEY = 'dolmeng-malmoi:splash-seen'
 
@@ -96,11 +97,11 @@ export default function Home() {
           <div className="shelf">
             {BOOKS.map((b) => {
               const last = store.lastPage[b.id]
-              const marks = (store.bookmarks[b.id] || []).length
+              const locked = !isBookUnlocked(b.id, store.storyAnswers)
               return (
                 <article
                   key={b.id}
-                  className="book-card"
+                  className={`book-card ${locked ? 'locked' : ''}`}
                   style={{ '--book-accent': b.accent, '--book-soft': b.accentSoft }}
                 >
                   <div className="cover">
@@ -111,6 +112,11 @@ export default function Home() {
                     <div className="mark" aria-hidden="true" />
                     <h3 className="title">{b.title}</h3>
                     <p className="cover-sub">{b.subtitle}</p>
+                    {locked && (
+                      <span className="cover-lock" aria-hidden="true">
+                        <IconLock width="16" height="16" />
+                      </span>
+                    )}
                   </div>
 
                   <div className="book-body">
@@ -121,18 +127,27 @@ export default function Home() {
 
                     <div className="book-meta">
                       <span>
-                        {last ? `${last}쪽까지 읽음` : '아직 펼치지 않음'}
+                        {locked
+                          ? '앞 사전을 먼저 완성하세요'
+                          : last
+                            ? `${last}쪽까지 읽음`
+                            : '아직 펼치지 않음'}
                       </span>
-                      {marks > 0 && <span>북마크 {marks}</span>}
                     </div>
 
-                    <Link
-                      className="btn solid enter"
-                      to={`/read/${b.id}`}
-                      aria-label={`${b.title} 사전 ${last ? '이어 읽기' : '펼치기'}`}
-                    >
-                      {last ? '이어 읽기' : '사전 펼치기'}
-                    </Link>
+                    {locked ? (
+                      <span className="btn enter" aria-disabled="true">
+                        <IconLock width="14" height="14" /> 잠겨 있음
+                      </span>
+                    ) : (
+                      <Link
+                        className="btn solid enter"
+                        to={`/read/${b.id}`}
+                        aria-label={`${b.title} 사전 ${last ? '이어 읽기' : '펼치기'}`}
+                      >
+                        {last ? '이어 읽기' : '사전 펼치기'}
+                      </Link>
+                    )}
                   </div>
                 </article>
               )

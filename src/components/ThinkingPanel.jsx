@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ACTIVITIES, CONCEPTS, WRITE_IT_DOWN } from '../data/scaffolds.js'
-import { IconCaret, IconClose, IconPencil } from './Icons.jsx'
+import { BOOKS, isBookUnlocked } from '../data/books.js'
+import { useStore, setStoryAnswer, completeStory } from '../lib/storage.js'
+import { IconCaret, IconClose, IconPencil, IconLock } from './Icons.jsx'
 
 /** 접었다 펴는 도움말 블록 */
 function Disc({ title, children, defaultOpen = false }) {
@@ -188,11 +191,186 @@ function ConceptCards() {
   )
 }
 
+const FIELDS = ['word', 's1', 's2', 's3']
+
+function AnswerRow({ label, value }) {
+  return (
+    <div className="answer-row">
+      <span className="answer-row-label">{label}</span>
+      <p>{value || '—'}</p>
+    </div>
+  )
+}
+
+/**
+ * "~에 담긴 이야기" 전용: 4단계(단어 고르기 → 1·2·3단계)를 한 번에 하나씩 입력받는다.
+ * 전부 채워야 다음 사전이 열린다. 3단계는 학생들이 특히 어려워해서 힌트를 더 준다.
+ */
+function StoryWizard({ act, bookId, setActivityId }) {
+  const store = useStore()
+  const navigate = useNavigate()
+  const answers = store.storyAnswers[bookId] || {}
+  const done = !!answers.completedAt
+
+  const firstEmptyIdx = () => {
+    const idx = FIELDS.findIndex((f) => !answers[f]?.trim())
+    return idx === -1 ? 3 : idx
+  }
+
+  const [step, setStep] = useState(() => (done ? 3 : firstEmptyIdx()))
+  const [editing, setEditing] = useState(false)
+
+  useEffect(() => {
+    setStep(done ? 3 : firstEmptyIdx())
+    setEditing(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId])
+
+  const steps = [
+    { label: '마음에 남은 말', prompt: act.wordPrompt, short: true },
+    {
+      label: `1단계 · ${act.steps[0].label}`,
+      prompt: act.steps[0].answerPrompt || act.steps[0].text,
+    },
+    {
+      label: `2단계 · ${act.steps[1].label}`,
+      prompt: act.steps[1].answerPrompt || act.steps[1].text,
+    },
+    {
+      label: `3단계 · ${act.steps[2].label}`,
+      prompt: act.steps[2].answerPrompt || act.steps[2].text,
+      extraHints: act.step3Hints,
+      keywords: act.keywords,
+    },
+  ]
+
+  const field = FIELDS[step]
+  const value = answers[field] || ''
+  const canNext = value.trim().length >= (step === 0 ? 1 : 2)
+  const meta = steps[step]
+
+  const bookIdx = BOOKS.findIndex((b) => b.id === bookId)
+  const nextBook = BOOKS[bookIdx + 1]
+
+  const goNext = () => {
+    if (!canNext) return
+    if (step < 3) {
+      setStep(step + 1)
+      return
+    }
+    completeStory(bookId)
+    setEditing(false)
+  }
+  const goPrev = () => step > 0 && setStep(step - 1)
+
+  const jumpToNext = () => {
+    if (!nextBook) return
+    setActivityId(nextBook.scaffoldId)
+    navigate(`/read/${nextBook.id}`)
+  }
+
+  if (done && !editing) {
+    return (
+      <div className="wizard-done">
+        <span className="q-mark">완성!</span>
+        <p className="wizard-done-msg">
+          <b>{act.bookId && BOOKS.find((b) => b.id === act.bookId)?.title}</b>에 담긴 이야기를
+          모두 적었어요.
+        </p>
+        <div className="wizard-answers">
+          <AnswerRow label="마음에 남은 말" value={answers.word} />
+          <AnswerRow label={act.steps[0].label} value={answers.s1} />
+          <AnswerRow label={act.steps[1].label} value={answers.s2} />
+          <AnswerRow label={act.steps[2].label} value={answers.s3} />
+        </div>
+        <div className="wizard-done-actions">
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              setEditing(true)
+              setStep(0)
+            }}
+          >
+            내 답 다시 보고 고치기
+          </button>
+          {nextBook ? (
+            <button type="button" className="btn solid" onClick={jumpToNext}>
+              {nextBook.shortTitle || nextBook.title} 사전 열기 →
+            </button>
+          ) : (
+            <button type="button" className="btn solid" onClick={() => navigate('/closing')}>
+              2056년 친구들에게 편지 쓰러 가기 →
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="wizard">
+      <div className="wizard-progress">
+        {FIELDS.map((f, i) => (
+          <span
+            key={f}
+            className={`wizard-dot ${i === step ? 'cur' : ''} ${
+              answers[f]?.trim() ? 'filled' : ''
+            }`}
+          />
+        ))}
+        <span className="wizard-count">{step + 1} / 4</span>
+      </div>
+
+      <div className="core-q">
+        <span className="q-mark">{meta.label}</span>
+        <p>{meta.prompt}</p>
+      </div>
+
+      {step === 3 && meta.extraHints && (
+        <Disc title="생각 힌트 보기" defaultOpen>
+          <StagedHints hints={meta.extraHints} actId={`${bookId}:s3`} />
+        </Disc>
+      )}
+      {step === 3 && meta.keywords && (
+        <Disc title="생각 키워드 보기">
+          <div className="keywords">
+            {meta.keywords.map((k) => (
+              <span className="kw" key={k}>
+                {k}
+              </span>
+            ))}
+          </div>
+        </Disc>
+      )}
+
+      <textarea
+        className="wizard-input"
+        rows={step === 0 ? 2 : 4}
+        value={value}
+        placeholder={step === 0 ? '단어를 적어 보세요' : '떠오른 생각을 자유롭게 써 보세요'}
+        onChange={(e) => setStoryAnswer(bookId, field, e.target.value)}
+      />
+
+      <div className="wizard-nav">
+        <button type="button" className="btn ghost" onClick={goPrev} disabled={step === 0}>
+          이전
+        </button>
+        <button type="button" className="btn solid" onClick={goNext} disabled={!canNext}>
+          {step < 3 ? '다음' : '완료하기'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ThinkingPanel({ activityId, setActivityId, onClose, accent, isMobile }) {
+  const store = useStore()
   const act = useMemo(
     () => ACTIVITIES.find((a) => a.id === activityId) || ACTIVITIES[0],
     [activityId]
   )
+  const isStory = !!act.bookId
 
   return (
     <aside
@@ -216,18 +394,24 @@ export default function ThinkingPanel({ activityId, setActivityId, onClose, acce
       </div>
 
       <div className="activity-tabs" role="tablist" aria-label="탐구 활동 선택">
-        {ACTIVITIES.map((a) => (
-          <button
-            key={a.id}
-            type="button"
-            role="tab"
-            aria-pressed={a.id === act.id}
-            aria-selected={a.id === act.id}
-            onClick={() => setActivityId(a.id)}
-          >
-            {a.nav}
-          </button>
-        ))}
+        {ACTIVITIES.map((a) => {
+          const locked = a.bookId && !isBookUnlocked(a.bookId, store.storyAnswers)
+          return (
+            <button
+              key={a.id}
+              type="button"
+              role="tab"
+              aria-pressed={a.id === act.id}
+              aria-selected={a.id === act.id}
+              disabled={locked}
+              title={locked ? '앞 사전의 이야기를 먼저 완성해야 열려요' : undefined}
+              onClick={() => !locked && setActivityId(a.id)}
+            >
+              {locked && <IconLock width="12" height="12" />}
+              {a.nav}
+            </button>
+          )
+        })}
       </div>
 
       <div className="panel-scroll">
@@ -235,69 +419,75 @@ export default function ThinkingPanel({ activityId, setActivityId, onClose, acce
         <p className="act-guide">{act.guide}</p>
         {act.concept && <p className="act-concept">핵심 개념 · {act.concept}</p>}
 
-        {/* 기본 상태에서는 핵심 질문 하나만 보인다 */}
-        <div className="core-q">
-          <span className="q-mark">핵심 질문</span>
-          <p>{act.core}</p>
-        </div>
+        {isStory ? (
+          <StoryWizard act={act} bookId={act.bookId} setActivityId={setActivityId} />
+        ) : (
+          <>
+            {/* 기본 상태에서는 핵심 질문 하나만 보인다 */}
+            <div className="core-q">
+              <span className="q-mark">핵심 질문</span>
+              <p>{act.core}</p>
+            </div>
 
-        {act.steps && (
-          <Disc title="단계별로 생각하기">
-            <StagedSteps steps={act.steps} actId={act.id} />
-          </Disc>
-        )}
+            {act.steps && (
+              <Disc title="단계별로 생각하기">
+                <StagedSteps steps={act.steps} actId={act.id} />
+              </Disc>
+            )}
 
-        {act.hints && (
-          <Disc title="생각 힌트 보기">
-            <StagedHints hints={act.hints} actId={act.id} />
-          </Disc>
-        )}
+            {act.hints && (
+              <Disc title="생각 힌트 보기">
+                <StagedHints hints={act.hints} actId={act.id} />
+              </Disc>
+            )}
 
-        {act.questions && (
-          <Disc title="더 생각할 질문 보기">
-            <ul className="qlist">
-              {act.questions.map((q, i) => (
-                <li key={i}>{q}</li>
-              ))}
-            </ul>
-          </Disc>
-        )}
+            {act.questions && (
+              <Disc title="더 생각할 질문 보기">
+                <ul className="qlist">
+                  {act.questions.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                </ul>
+              </Disc>
+            )}
 
-        {act.planner && (
-          <Disc title="실천 계획 조각 맞추기">
-            <Planner planner={act.planner} actId={act.id} />
-          </Disc>
-        )}
+            {act.planner && (
+              <Disc title="실천 계획 조각 맞추기">
+                <Planner planner={act.planner} actId={act.id} />
+              </Disc>
+            )}
 
-        {act.keywords && (
-          <Disc title="생각 키워드 보기">
-            <Keywords list={act.keywords} actId={act.id} />
-          </Disc>
-        )}
+            {act.keywords && (
+              <Disc title="생각 키워드 보기">
+                <Keywords list={act.keywords} actId={act.id} />
+              </Disc>
+            )}
 
-        {act.frames && (
-          <Disc title="문장 틀 보기">
-            <Frames frames={act.frames} />
-          </Disc>
-        )}
+            {act.frames && (
+              <Disc title="문장 틀 보기">
+                <Frames frames={act.frames} />
+              </Disc>
+            )}
 
-        {act.extra && (
-          <div className="extra-q">
-            <span className="q-mark" style={{ display: 'block', marginBottom: 8 }}>
-              한 걸음 더
-            </span>
-            {act.extra}
-          </div>
-        )}
+            {act.extra && (
+              <div className="extra-q">
+                <span className="q-mark" style={{ display: 'block', marginBottom: 8 }}>
+                  한 걸음 더
+                </span>
+                {act.extra}
+              </div>
+            )}
 
-        {act.checks && (
-          <Disc title="내 다짐이 구체적인지 점검하기">
-            <ul className="qlist">
-              {act.checks.map((q, i) => (
-                <li key={i}>{q}</li>
-              ))}
-            </ul>
-          </Disc>
+            {act.checks && (
+              <Disc title="내 다짐이 구체적인지 점검하기">
+                <ul className="qlist">
+                  {act.checks.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                </ul>
+              </Disc>
+            )}
+          </>
         )}
 
         <Disc title="생각 · 문화 · 정체성이 무슨 말일까?">

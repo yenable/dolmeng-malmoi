@@ -3,7 +3,7 @@ import { renderPage } from '../lib/pdf.js'
 
 const THUMB_W = 84
 
-function Thumb({ pdf, docId, pageNum, current, bookmarked, onPick }) {
+function Thumb({ pdf, docId, pageNum, current, onPick }) {
   const hostRef = useRef(null)
   const btnRef = useRef(null)
   const [seen, setSeen] = useState(false)
@@ -50,34 +50,21 @@ function Thumb({ pdf, docId, pageNum, current, bookmarked, onPick }) {
       ref={btnRef}
       className="thumb"
       aria-current={current}
-      aria-label={`${pageNum}쪽으로 이동${bookmarked ? ' (북마크됨)' : ''}`}
+      aria-label={`${pageNum}쪽으로 이동`}
       onClick={() => onPick(pageNum)}
     >
       <div ref={hostRef} className="ph" />
-      {bookmarked && (
-        <span className="bm" aria-hidden="true">
-          ★
-        </span>
-      )}
       <span className="n">{pageNum}</span>
     </button>
   )
 }
 
-export default function ThumbnailRail({ pdf, docId, numPages, page, bookmarks, onPick }) {
+export default function ThumbnailRail({ pdf, docId, numPages, page, onPick }) {
   const pages = Array.from({ length: numPages }, (_, i) => i + 1)
   return (
     <div className="thumbs" role="list" aria-label="페이지 목록">
       {pages.map((n) => (
-        <Thumb
-          key={n}
-          pdf={pdf}
-          docId={docId}
-          pageNum={n}
-          current={n === page}
-          bookmarked={(bookmarks || []).includes(n)}
-          onPick={onPick}
-        />
+        <Thumb key={n} pdf={pdf} docId={docId} pageNum={n} current={n === page} onPick={onPick} />
       ))}
     </div>
   )

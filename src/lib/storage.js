@@ -1,21 +1,26 @@
-// 서버도 로그인도 없다. 읽던 위치·북마크·한 줄 메모만 브라우저에 남긴다.
+// 서버도 로그인도 없다. 읽던 위치·사전별 탐구 답변만 브라우저에 남긴다.
 import { useSyncExternalStore } from 'react'
 
 const KEY = 'dolmeng-malmoi:v1'
 
+const EMPTY_STORY = { word: '', s1: '', s2: '', s3: '', completedAt: null }
+
 const DEFAULTS = {
   lastBook: null,
   lastPage: {}, // bookId -> page
-  bookmarks: {}, // bookId -> [page]
-  memos: {}, // `${bookId}:${page}` -> string
   prefs: {
     spread: true, // PC 펼침 보기
-    flip: true, // 책장 넘김 효과
     panelOpen: false, // 생각 도우미는 접힌 상태로 시작
     thumbsOpen: false,
     activity: 'memorable',
   },
   visited: {}, // bookId -> true
+  // 사전별 "~에 담긴 이야기" 단계 답변. 다음 사전 잠금 해제 조건이기도 하다.
+  storyAnswers: {
+    goyueo: { ...EMPTY_STORY },
+    jiyeogeo: { ...EMPTY_STORY },
+    hyundaeeo: { ...EMPTY_STORY },
+  },
   letter: {
     draft: { name: '', number: '', title: '', text: '' },
     submittedId: null,
@@ -32,6 +37,11 @@ function read() {
       ...DEFAULTS,
       ...parsed,
       prefs: { ...DEFAULTS.prefs, ...(parsed.prefs || {}) },
+      storyAnswers: {
+        goyueo: { ...EMPTY_STORY, ...(parsed.storyAnswers?.goyueo || {}) },
+        jiyeogeo: { ...EMPTY_STORY, ...(parsed.storyAnswers?.jiyeogeo || {}) },
+        hyundaeeo: { ...EMPTY_STORY, ...(parsed.storyAnswers?.hyundaeeo || {}) },
+      },
       letter: {
         ...DEFAULTS.letter,
         ...(parsed.letter || {}),
@@ -83,24 +93,29 @@ export function setLastPage(bookId, page) {
   })
 }
 
-export function toggleBookmark(bookId, page) {
-  const list = state.bookmarks[bookId] || []
-  const next = list.includes(page)
-    ? list.filter((p) => p !== page)
-    : [...list, page].sort((a, b) => a - b)
-  commit({ ...state, bookmarks: { ...state.bookmarks, [bookId]: next } })
+export function setStoryAnswer(bookId, field, value) {
+  const prev = state.storyAnswers[bookId] || { ...EMPTY_STORY }
+  commit({
+    ...state,
+    storyAnswers: { ...state.storyAnswers, [bookId]: { ...prev, [field]: value } },
+  })
 }
 
-export function setMemo(bookId, page, text) {
-  const k = `${bookId}:${page}`
-  const memos = { ...state.memos }
-  if (text && text.trim()) memos[k] = text.slice(0, 100)
-  else delete memos[k]
-  commit({ ...state, memos })
+export function completeStory(bookId) {
+  const prev = state.storyAnswers[bookId] || { ...EMPTY_STORY }
+  if (prev.completedAt) return
+  commit({
+    ...state,
+    storyAnswers: {
+      ...state.storyAnswers,
+      [bookId]: { ...prev, completedAt: Date.now() },
+    },
+  })
 }
 
-export function getMemo(snapshot, bookId, page) {
-  return snapshot.memos[`${bookId}:${page}`] || ''
+/** 다음 학생이 같은 기기로 이어서 할 때 한 사전의 답변만 비운다. */
+export function resetStory(bookId) {
+  commit({ ...state, storyAnswers: { ...state.storyAnswers, [bookId]: { ...EMPTY_STORY } } })
 }
 
 export function setLetterDraft(patch) {
@@ -120,5 +135,13 @@ export function resetLetter() {
 }
 
 export function resetAll() {
-  commit({ ...DEFAULTS, prefs: { ...DEFAULTS.prefs } })
+  commit({
+    ...DEFAULTS,
+    prefs: { ...DEFAULTS.prefs },
+    storyAnswers: {
+      goyueo: { ...EMPTY_STORY },
+      jiyeogeo: { ...EMPTY_STORY },
+      hyundaeeo: { ...EMPTY_STORY },
+    },
+  })
 }

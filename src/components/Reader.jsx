@@ -1,16 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { BOOKS, getBook } from '../data/books.js'
+import { BOOKS, getBook, isBookUnlocked, lastUnlockedBook } from '../data/books.js'
 import { ACTIVITIES } from '../data/scaffolds.js'
 import { loadBook, getAspect, renderPage, describeError } from '../lib/pdf.js'
-import {
-  useStore,
-  setPref,
-  setLastPage,
-  toggleBookmark,
-  setMemo,
-  getMemo,
-} from '../lib/storage.js'
+import { useStore, setPref, setLastPage } from '../lib/storage.js'
 import {
   nextPage as nextOf,
   prevPage as prevOf,
@@ -34,10 +27,10 @@ import {
   IconGrid,
   IconSpread,
   IconSingle,
-  IconBookmark,
   IconBulb,
   IconPresent,
   IconClose,
+  IconLock,
 } from './Icons.jsx'
 
 function useMedia(query) {
@@ -80,12 +73,17 @@ export default function Reader() {
   const panelOpen = prefs.panelOpen
   const thumbsOpen = prefs.thumbsOpen
   const activityId = prefs.activity
-  const bookmarks = (book && store.bookmarks[book.id]) || []
+  const locked = book ? !isBookUnlocked(book.id, store.storyAnswers) : false
 
   // ── 사전 불러오기 ─────────────────────────
   useEffect(() => {
     if (!book) {
       navigate('/', { replace: true })
+      return
+    }
+    if (locked) {
+      setLoading(false)
+      setPdf(null)
       return
     }
     let alive = true
@@ -119,7 +117,7 @@ export default function Reader() {
     return () => {
       alive = false
     }
-  }, [book, navigate])
+  }, [book, navigate, locked])
 
   // ── 마지막으로 읽은 위치 복원 ─────────────────────────
   const restoredFor = useRef(null)
@@ -238,10 +236,6 @@ export default function Reader() {
         case 'F':
           toggleFull()
           break
-        case 'b':
-        case 'B':
-          if (book) toggleBookmark(book.id, page)
-          break
         case 'Escape':
           if (showQuestion) setShowQuestion(false)
           else if (classMode) setClassMode(false)
@@ -263,8 +257,6 @@ export default function Reader() {
   if (!book) return null
 
   const atLast = !canGoNext(page, numPages, spread)
-  const memo = getMemo(store, book.id, page)
-  const isBookmarked = bookmarks.includes(page)
 
   return (
     <div
@@ -312,17 +304,26 @@ export default function Reader() {
           </Link>
 
           <nav className="book-switch" aria-label="사전 바꾸기">
-            {BOOKS.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                aria-current={b.id === book.id}
-                onClick={() => navigate(`/read/${b.id}`)}
-              >
-                <span className="dot" style={{ background: b.accent }} aria-hidden="true" />
-                {b.shortTitle || b.title}
-              </button>
-            ))}
+            {BOOKS.map((b) => {
+              const bLocked = !isBookUnlocked(b.id, store.storyAnswers)
+              return (
+                <button
+                  key={b.id}
+                  type="button"
+                  aria-current={b.id === book.id}
+                  disabled={bLocked}
+                  title={bLocked ? '앞 사전의 이야기를 먼저 완성해야 열려요' : undefined}
+                  onClick={() => !bLocked && navigate(`/read/${b.id}`)}
+                >
+                  {bLocked ? (
+                    <IconLock width="12" height="12" />
+                  ) : (
+                    <span className="dot" style={{ background: b.accent }} aria-hidden="true" />
+                  )}
+                  {b.shortTitle || b.title}
+                </button>
+              )
+            })}
           </nav>
 
           <span className="spacer" />
@@ -375,7 +376,7 @@ export default function Reader() {
       <div className="reader-body">
         <div className="stage-column">
           <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex' }}>
-            {pdf && !error && (
+            {pdf && !error && !locked && (
               <BookStage
                 pdf={pdf}
                 docId={book.file}
@@ -386,13 +387,38 @@ export default function Reader() {
                 zoom={zoom}
                 setZoom={setZoom}
                 flipEnabled={prefs.flip}
-                bookmarks={bookmarks}
                 onNext={goNext}
                 onPrev={goPrev}
               />
             )}
 
-            {(loading || error) && (
+            {locked && (
+              <div className="stage-msg">
+                <div className="box">
+                  <h3>
+                    <IconLock width="18" height="18" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                    아직 잠겨 있어요
+                  </h3>
+                  <p>
+                    {lastUnlockedBook(store.storyAnswers).title} 사전의 "~에 담긴 이야기" 4단계를
+                    모두 마치면 {book.title} 사전이 열립니다.
+                  </p>
+                  <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center' }}>
+                    <Link
+                      className="btn solid"
+                      to={`/read/${lastUnlockedBook(store.storyAnswers).id}`}
+                    >
+                      {lastUnlockedBook(store.storyAnswers).title} 사전으로
+                    </Link>
+                    <Link className="btn" to="/">
+                      처음으로
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!locked && (loading || error) && (
               <div className="stage-msg">
                 <div className="box">
                   {loading && !error ? (
@@ -452,13 +478,12 @@ export default function Reader() {
           </div>
 
           {/* ── 썸네일 ───────────────── */}
-          {thumbsOpen && pdf && !classMode && (
+          {thumbsOpen && pdf && !classMode && !locked && (
             <ThumbnailRail
               pdf={pdf}
               docId={book.file}
               numPages={numPages}
               page={page}
-              bookmarks={bookmarks}
               onPick={goTo}
             />
           )}
@@ -531,16 +556,6 @@ export default function Reader() {
 
             <button
               type="button"
-              className={`btn icon ${isBookmarked ? 'on' : ''}`}
-              onClick={() => toggleBookmark(book.id, page)}
-              aria-pressed={isBookmarked}
-              aria-label={isBookmarked ? '북마크 해제' : '이 쪽 북마크'}
-              title="북마크 (B)"
-            >
-              <IconBookmark filled={isBookmarked} />
-            </button>
-            <button
-              type="button"
               className="btn icon"
               onClick={toggleFull}
               aria-label={isFull ? '전체 화면 끄기' : '전체 화면'}
@@ -548,36 +563,11 @@ export default function Reader() {
             >
               <IconFullscreen />
             </button>
-            {!classMode && (
-              <button
-                type="button"
-                className={`btn ${prefs.flip ? 'on' : ''}`}
-                onClick={() => setPref('flip', !prefs.flip)}
-                aria-pressed={prefs.flip}
-                title="책장 넘김 효과를 끄면 더 빠릅니다"
-              >
-                책장 넘김
-              </button>
-            )}
 
             {atLast && numPages > 0 && (
               <Link className="btn solid" to="/closing" style={{ textDecoration: 'none' }}>
                 2056년의 어린이들에게 →
               </Link>
-            )}
-
-            {!classMode && (
-              <div className="memo-row">
-                <label htmlFor="memo">한 줄 메모</label>
-                <input
-                  id="memo"
-                  type="text"
-                  maxLength={100}
-                  value={memo}
-                  placeholder="이 쪽에서 눈에 띈 말을 짧게 적어 두세요 (학습지에 옮겨 적기용)"
-                  onChange={(e) => setMemo(book.id, page, e.target.value)}
-                />
-              </div>
             )}
           </div>
         </div>

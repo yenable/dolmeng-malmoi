@@ -95,6 +95,12 @@ export const IconClose = (p) => (
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
 )
+export const IconLock = (p) => (
+  <svg {...base} {...p}>
+    <rect x="5" y="10.5" width="14" height="9.5" rx="1.8" />
+    <path d="M8 10.5V7.5a4 4 0 018 0v3" />
+  </svg>
+)
 export const IconPencil = (p) => (
   <svg {...base} {...p}>
     <path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17v3z" />

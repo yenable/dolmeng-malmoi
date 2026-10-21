@@ -14,7 +14,7 @@ function prefersReducedMotion() {
 }
 
 /** 한 쪽을 캔버스로 그려 넣는 칸 */
-function PageSlot({ pdf, docId, pageNum, width, height, side, bookmarked }) {
+function PageSlot({ pdf, docId, pageNum, width, height, side }) {
   const hostRef = useRef(null)
   const [ready, setReady] = useState(false)
 
@@ -49,10 +49,7 @@ function PageSlot({ pdf, docId, pageNum, width, height, side, bookmarked }) {
     >
       <div ref={hostRef} style={{ width: '100%', height: '100%' }} />
       {!ready && <div className="page-skeleton" />}
-      <span className="page-no-badge">
-        {bookmarked ? '☆ ' : ''}
-        {pageNum}
-      </span>
+      <span className="page-no-badge">{pageNum}</span>
     </div>
   )
 }
@@ -67,7 +64,6 @@ export default function BookStage({
   zoom,
   setZoom,
   flipEnabled,
-  bookmarks,
   onNext,
   onPrev,
 }) {
@@ -302,8 +298,6 @@ export default function BookStage({
 
   const contentTransform = `translate(-50%, -50%) translate(${pan.x + soloOffset}px, ${pan.y}px) scale(${liveScale})`
 
-  const bm = bookmarks || []
-
   return (
     <div
       ref={viewportRef}
@@ -325,7 +319,6 @@ export default function BookStage({
                 width={pageW}
                 height={pageH}
                 side="left"
-                bookmarked={bm.includes(slots[0])}
               />
               <PageSlot
                 pdf={pdf}
@@ -334,7 +327,6 @@ export default function BookStage({
                 width={pageW}
                 height={pageH}
                 side="right"
-                bookmarked={bm.includes(slots[1])}
               />
               {slots[0] && slots[1] && <div className="spine-shadow" />}
             </>
@@ -346,7 +338,6 @@ export default function BookStage({
               width={pageW}
               height={pageH}
               side="solo"
-              bookmarked={bm.includes(page)}
             />
           )}
 

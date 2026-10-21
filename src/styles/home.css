@@ -153,6 +153,34 @@
   color: var(--ink-soft);
   letter-spacing: -0.01em;
 }
+.book-card.locked {
+  opacity: 0.68;
+}
+.book-card.locked .cover {
+  filter: grayscale(0.5);
+}
+.cover-lock {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+}
+.book-body .btn.enter[aria-disabled='true'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: not-allowed;
+  background: var(--paper-deep);
+  color: var(--ink-faint);
+  border-color: var(--line);
+}
 .cover .seal {
   position: absolute;
   right: 22px;

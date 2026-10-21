@@ -50,3 +50,24 @@ export const BOOKS = [
 export function getBook(id) {
   return BOOKS.find((b) => b.id === id) || null
 }
+
+/**
+ * 고유어 → 지역어 → 현대어 순서로만 열린다.
+ * 앞 사전의 "~에 담긴 이야기" 4단계를 모두 마쳐야(completedAt) 다음 사전이 열린다.
+ */
+export function isBookUnlocked(bookId, storyAnswers) {
+  const idx = BOOKS.findIndex((b) => b.id === bookId)
+  if (idx <= 0) return true
+  const prev = BOOKS[idx - 1]
+  return !!storyAnswers?.[prev.id]?.completedAt
+}
+
+/** 학생이 지금 도달할 수 있는 가장 앞선(마지막으로 열린) 사전. */
+export function lastUnlockedBook(storyAnswers) {
+  let result = BOOKS[0]
+  for (const b of BOOKS) {
+    if (!isBookUnlocked(b.id, storyAnswers)) break
+    result = b
+  }
+  return result
+}
