@@ -1,0 +1,149 @@
+/* ── 교사용 수업 모드 ─────────────────────────── */
+.reader.class-mode .topbar {
+  height: 56px;
+}
+.reader.class-mode .stage {
+  background: #efeadf;
+}
+
+.cm-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: var(--ink);
+  color: #fff;
+  z-index: 30;
+}
+.cm-bar .cm-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.cm-bar .cm-title .pill {
+  background: var(--accent);
+  color: #3a2c06;
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.cm-bar .spacer {
+  flex: 1;
+}
+.cm-bar .btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.26);
+  color: #fff;
+}
+.cm-bar .btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.cm-bar .btn.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #3a2c06;
+}
+
+/* 큰 페이지 넘김 버튼 */
+.cm-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 76px;
+  height: 128px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  font-size: 34px;
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+  z-index: 18;
+  transition: background 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.cm-nav:hover:not(:disabled) {
+  background: #fff;
+}
+.cm-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.cm-nav.prev {
+  left: 18px;
+}
+.cm-nav.next {
+  right: 18px;
+}
+
+/* 질문만 띄우기 */
+.cm-question {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 23, 27, 0.93);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 6vh 7vw;
+  z-index: 50;
+  text-align: center;
+  animation: fade-in 0.26s var(--ease);
+}
+.cm-question .label {
+  font-size: clamp(13px, 1.4vw, 17px);
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: var(--accent);
+}
+.cm-question h2 {
+  font-size: clamp(30px, 5.2vw, 66px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.32;
+  max-width: 18em;
+}
+.cm-question .cm-q-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cm-question .idx {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+  min-width: 62px;
+}
+.cm-question .btn {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 11px 20px;
+  font-size: 15.5px;
+}
+.cm-question .btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* 수업 모드에서는 하단 컨트롤을 크게 */
+.reader.class-mode .controls .btn {
+  padding: 12px 20px;
+  font-size: 16px;
+}
+.reader.class-mode .controls .btn.icon {
+  width: 46px;
+  height: 46px;
+}
+.reader.class-mode .pageinfo {
+  font-size: 17px;
+  min-width: 130px;
+}

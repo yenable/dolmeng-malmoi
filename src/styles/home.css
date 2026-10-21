@@ -1,0 +1,326 @@
+.home {
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.home-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 72px 28px 96px;
+}
+
+/* ── 헤더 ─────────────────────────── */
+.hero {
+  text-align: center;
+  padding-bottom: 8px;
+}
+.hero .eyebrow {
+  display: block;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(34px, 6.2vw, 58px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+.hero .sub {
+  margin-top: 18px;
+  font-size: clamp(16px, 2.2vw, 19px);
+  color: var(--ink-soft);
+  letter-spacing: -0.015em;
+}
+.hero .tag {
+  margin-top: 26px;
+  display: inline-block;
+  font-size: 14px;
+  color: #6a5212;
+  background: var(--accent-soft);
+  border: 1px solid #ecd79a;
+  border-radius: 999px;
+  padding: 7px 18px;
+  letter-spacing: 0.01em;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  margin: 56px 0;
+  border: 0;
+}
+
+/* ── 안내문 ─────────────────────────── */
+.intro {
+  max-width: 660px;
+  margin: 0 auto;
+  text-align: center;
+}
+.intro p {
+  font-size: 16.5px;
+  color: var(--ink-soft);
+  letter-spacing: -0.012em;
+}
+.intro p + p {
+  margin-top: 10px;
+}
+.intro p.lead {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 600;
+}
+.intro p.note {
+  margin-top: 18px;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  display: inline-block;
+}
+
+/* ── 사전 세 권 ─────────────────────────── */
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 860px) {
+  .shelf {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+.book-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease);
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.cover {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--book-soft);
+  border-bottom: 1px solid var(--line);
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* 책등 */
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 9px;
+  background: var(--book-accent);
+  opacity: 0.9;
+}
+.cover .no {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--book-accent);
+}
+.cover .title {
+  margin-top: auto;
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+.cover .cover-sub {
+  margin-top: 8px;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  letter-spacing: -0.01em;
+}
+.cover .seal {
+  position: absolute;
+  right: 22px;
+  top: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--book-accent);
+  color: var(--book-accent);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+.cover .mark {
+  position: absolute;
+  left: 9px;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--book-accent) 13%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.book-body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+.book-body .q {
+  font-size: 15px;
+  color: var(--ink-soft);
+  letter-spacing: -0.012em;
+  line-height: 1.6;
+  flex: 1;
+}
+.book-body .q strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-bottom: 7px;
+}
+.book-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.enter {
+  width: 100%;
+  justify-content: center;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-size: 15px;
+}
+
+/* ── 활동 순서 ─────────────────────────── */
+.section-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+.section-desc {
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin-bottom: 26px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (max-width: 860px) {
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
+.step {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 18px 18px 20px;
+}
+.step .n {
+  display: inline-grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 11px;
+}
+.step h4 {
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 5px;
+}
+.step p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* ── 생각 도우미 안내 ─────────────────────────── */
+.helper-note {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+@media (max-width: 720px) {
+  .helper-note {
+    grid-template-columns: 1fr;
+  }
+}
+.helper-note h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+.helper-note p {
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.sheet-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.home-foot {
+  margin-top: 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.home-foot .credit {
+  font-size: 13px;
+  color: var(--ink-faint);
+}

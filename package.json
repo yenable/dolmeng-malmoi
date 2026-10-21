@@ -1,0 +1,23 @@
+{
+  "name": "dolmeng-malmoi",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "돌멩민국 말모이 프로젝트 — 2026 우리말 큰사전 전자책 + 생각 도우미",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check:pdf": "node scripts/check-pdfs.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "4.10.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
