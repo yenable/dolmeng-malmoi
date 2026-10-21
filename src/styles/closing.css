@@ -1,7 +1,5 @@
 .closing {
   min-height: 100%;
-  display: grid;
-  place-items: center;
   padding: 72px 28px 88px;
   position: relative;
   background: linear-gradient(180deg, #fbf9f4 0%, #f5f1e6 100%);
@@ -9,6 +7,7 @@
 
 .closing-inner {
   max-width: 660px;
+  margin: 0 auto;
   text-align: center;
   animation: rise 0.8s var(--ease) both;
 }
