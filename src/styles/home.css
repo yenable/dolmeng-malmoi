@@ -10,6 +10,10 @@
   padding: 72px 28px 96px;
 }
 
+#shelf {
+  scroll-margin-top: 92px;
+}
+
 /* ── 헤더 ─────────────────────────── */
 .hero {
   text-align: center;

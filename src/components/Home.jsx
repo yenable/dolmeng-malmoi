@@ -1,7 +1,18 @@
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BOOKS } from '../data/books.js'
 import { ACTIVITIES } from '../data/scaffolds.js'
 import { useStore } from '../lib/storage.js'
+import Splash from './Splash.jsx'
+
+const SPLASH_KEY = 'dolmeng-malmoi:splash-seen'
+
+function reducedMotion() {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
 
 const FLOW = [
   { h: '사전 고르기', p: '세 권 중 한 권을 골라 전자책을 엽니다.' },
@@ -12,9 +23,46 @@ const FLOW = [
 
 export default function Home() {
   const store = useStore()
+  const shelfRef = useRef(null)
+
+  // 탭(세션)당 한 번만 스플래시를 보여 준다. 사전을 읽다가 처음으로 돌아왔을 때는 다시 뜨지 않는다.
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      return sessionStorage.getItem(SPLASH_KEY) !== '1'
+    } catch {
+      return true
+    }
+  })
+
+  const dismissSplash = () => {
+    try {
+      sessionStorage.setItem(SPLASH_KEY, '1')
+    } catch {
+      /* 사생활 보호 모드 등에서는 매번 다시 보여도 무방하다 */
+    }
+    setShowSplash(false)
+    window.setTimeout(() => {
+      shelfRef.current?.scrollIntoView({
+        behavior: reducedMotion() ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    }, 60)
+  }
 
   return (
     <div className="home paper-grain">
+      {showSplash && <Splash onDone={dismissSplash} />}
+
+      <button
+        type="button"
+        className="home-pin"
+        onClick={() =>
+          window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
+        }
+      >
+        돌멩민국 말모이 프로젝트
+      </button>
+
       <div className="home-inner">
         <header className="hero">
           <span className="eyebrow">2026 우리말 큰사전</span>
@@ -39,7 +87,7 @@ export default function Home() {
 
         <hr className="rule" />
 
-        <section aria-labelledby="shelf-h">
+        <section id="shelf" ref={shelfRef} aria-labelledby="shelf-h">
           <h2 id="shelf-h" className="section-title">
             세 권의 사전
           </h2>

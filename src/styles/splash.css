@@ -1,0 +1,140 @@
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 42px;
+  background: var(--paper);
+  cursor: pointer;
+  animation: splash-fade 0.5s var(--ease) both;
+}
+.splash.closing {
+  animation: splash-fade-out 0.44s var(--ease) both;
+  pointer-events: none;
+}
+@keyframes splash-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes splash-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.splash-inner {
+  text-align: center;
+  padding: 0 28px;
+}
+.splash-inner .eyebrow {
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: splash-rise 0.7s var(--ease) 0.12s both;
+}
+.splash-inner h1 {
+  font-size: clamp(32px, 7vw, 60px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+  opacity: 0;
+  animation: splash-rise 0.8s var(--ease) 0.26s both;
+}
+.splash-inner .sub {
+  margin-top: 18px;
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--ink-soft);
+  opacity: 0;
+  animation: splash-rise 0.7s var(--ease) 0.42s both;
+}
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.splash-skip {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 11px 22px;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--ink-soft);
+  opacity: 0;
+  animation: splash-rise 0.7s var(--ease) 0.62s both;
+  transition: background 0.18s var(--ease), color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.splash-skip:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash,
+  .splash.closing,
+  .splash-inner .eyebrow,
+  .splash-inner h1,
+  .splash-inner .sub,
+  .splash-skip {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── 좌측 상단 고정 로고 ─────────────────────────── */
+.home-pin {
+  position: fixed;
+  top: 16px;
+  left: 18px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: rgba(251, 249, 244, 0.88);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  animation: splash-rise 0.5s var(--ease) 0.1s both;
+  transition: background 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.home-pin:hover {
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-pin {
+    animation: none;
+  }
+}
+@media (max-width: 560px) {
+  .home-pin {
+    font-size: 12.5px;
+    padding: 7px 14px;
+    top: 12px;
+    left: 12px;
+  }
+}
