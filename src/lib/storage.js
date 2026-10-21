@@ -16,6 +16,11 @@ const DEFAULTS = {
     activity: 'memorable',
   },
   visited: {}, // bookId -> true
+  letter: {
+    draft: { name: '', number: '', title: '', text: '' },
+    submittedId: null,
+    submittedAt: null,
+  },
 }
 
 function read() {
@@ -27,6 +32,11 @@ function read() {
       ...DEFAULTS,
       ...parsed,
       prefs: { ...DEFAULTS.prefs, ...(parsed.prefs || {}) },
+      letter: {
+        ...DEFAULTS.letter,
+        ...(parsed.letter || {}),
+        draft: { ...DEFAULTS.letter.draft, ...(parsed.letter?.draft || {}) },
+      },
     }
   } catch {
     return DEFAULTS
@@ -91,6 +101,22 @@ export function setMemo(bookId, page, text) {
 
 export function getMemo(snapshot, bookId, page) {
   return snapshot.memos[`${bookId}:${page}`] || ''
+}
+
+export function setLetterDraft(patch) {
+  commit({ ...state, letter: { ...state.letter, draft: { ...state.letter.draft, ...patch } } })
+}
+
+export function markLetterSubmitted(id) {
+  commit({
+    ...state,
+    letter: { ...state.letter, submittedId: id, submittedAt: Date.now() },
+  })
+}
+
+/** 같은 기기를 다른 학생이 이어서 쓸 때 초안과 제출 상태를 비운다. */
+export function resetLetter() {
+  commit({ ...state, letter: { ...DEFAULTS.letter, draft: { ...DEFAULTS.letter.draft } } })
 }
 
 export function resetAll() {

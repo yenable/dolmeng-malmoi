@@ -1,0 +1,193 @@
+.admin,
+.board {
+  min-height: 100%;
+  position: relative;
+}
+.admin-inner,
+.board-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+.admin-head,
+.board-head {
+  margin-bottom: 28px;
+}
+.admin-head .home-link,
+.board-head .home-link {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+.admin-head .home-link:hover,
+.board-head .home-link:hover {
+  color: var(--ink);
+}
+.admin-head h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.board-head {
+  text-align: center;
+}
+.board-head h1 {
+  margin-top: 10px;
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.board-head p {
+  margin-top: 10px;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+}
+
+.admin-gate {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  text-align: center;
+}
+.admin-gate p {
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+.admin-note {
+  font-size: 14.5px;
+  color: var(--ink-faint);
+  padding: 20px 0;
+  text-align: center;
+}
+
+.admin-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.admin-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.admin-who {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.admin-card h3 {
+  margin-top: 4px;
+  font-size: 17.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.admin-meta {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.admin-text {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ink);
+  white-space: pre-wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.admin-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ── 공개 보드 ─────────────────────────── */
+.board-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.board-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.board-card-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: transparent;
+  border: 0;
+  padding: 18px 20px;
+  text-align: left;
+}
+.board-card-btn:hover {
+  background: var(--paper-deep);
+}
+.board-who {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.board-card h2 {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.board-date {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.board-text {
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: var(--ink);
+  white-space: pre-wrap;
+  padding: 0 20px 22px;
+  border-top: 1px solid var(--line);
+  margin-top: 0;
+  padding-top: 16px;
+}

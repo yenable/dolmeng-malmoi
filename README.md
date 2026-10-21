@@ -104,6 +104,31 @@ npm run preview  # 빌드 결과 미리보기
 
 별도 비밀번호 없이 화면 모드만 바뀝니다.
 
+## 2056년에게 쓰는 글 — 제출·승인·공개 보드
+
+마지막 화면(`/closing`)에는 학습지와 별개로, 2056년 어린이에게 보내는 긴 글을 **온라인으로 제출**하는
+기능이 있습니다. 이 부분만 Firebase(Firestore + Authentication)를 사용합니다 — 사전 읽기·생각
+도우미는 여전히 로그인·서버 없이 동작합니다.
+
+- 학생: 이름·번호·제목과 500자 이상의 글을 씁니다. 글을 쓰는 중 내용은 이 브라우저의
+  `localStorage`에 자동 저장되어 새로고침해도 사라지지 않습니다. 제출하면 선생님 승인 전까지는
+  작성자 본인 외에는 보이지 않습니다.
+- 선생님(관리자): `/#/admin` 에서 구글 계정(`lyy8867@gmail.com`)으로 로그인하면 승인 대기 중인
+  글을 확인하고 **승인**하거나 **반려(삭제)**할 수 있습니다. 이 계정 외에는 Firestore 보안 규칙이
+  승인 기능을 막습니다.
+- 모두: `/#/board` 에서 승인된 글만 모아서 볼 수 있습니다. 로그인이 필요 없습니다.
+
+Firebase 프로젝트: `dolmeng-malmoi-5c918` (Firestore 컬렉션 `letters`). 설정값은
+`src/lib/firebase.js`에 있습니다 — 이 값들은 비밀키가 아니라 공개 식별자이므로 코드에 그대로 두어도
+안전합니다. 실제 접근 제어는 `firestore.rules`에서 합니다. 규칙을 고친 뒤에는 반드시 다시 배포하세요.
+
+```bash
+firebase deploy --only firestore --project dolmeng-malmoi-5c918
+```
+
+관리자 이메일을 바꾸려면 `src/lib/firebase.js`의 `ADMIN_EMAIL`과 `firestore.rules`의
+`request.auth.token.email == '...'` 두 곳을 함께 고치고 다시 배포해야 합니다.
+
 ## 사전에서 특정 쪽 지우기
 
 원본에 잘못 들어간 쪽(빈 템플릿, 중복 등)을 영구히 빼야 할 때:

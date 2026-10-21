@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { BOOKS } from '../data/books.js'
+import LetterWriter from './LetterWriter.jsx'
 
 export default function Closing() {
   return (
@@ -22,7 +23,9 @@ export default function Closing() {
           2026년의 우리를 기록한 책일까요?
         </p>
 
-        <p className="last-note">이제 종이 학습지에 여러분의 생각을 남겨 주세요.</p>
+        <p className="last-note">
+          학습지 1·2·3번은 종이에 적고, 아래에서 2056년 친구들에게 보낼 글을 써 보세요.
+        </p>
 
         <div className="closing-actions">
           <Link className="btn" to="/">
@@ -33,8 +36,13 @@ export default function Closing() {
               {b.shortTitle || b.title} 다시 보기
             </Link>
           ))}
+          <Link className="btn" to="/board">
+            우리 반의 편지 모음 보기
+          </Link>
         </div>
       </div>
+
+      <LetterWriter />
     </div>
   )
 }

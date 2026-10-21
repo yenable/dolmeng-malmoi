@@ -10,6 +10,8 @@ import './styles/reader.css'
 import './styles/panel.css'
 import './styles/classmode.css'
 import './styles/closing.css'
+import './styles/letter.css'
+import './styles/admin.css'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
