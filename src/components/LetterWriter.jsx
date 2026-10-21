@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LETTER_SCAFFOLD } from '../data/scaffolds.js'
 import { useStore, setLetterDraft, markLetterSubmitted, resetLetter } from '../lib/storage.js'
 import { submitLetter, countChars, MIN_CHARS } from '../lib/letters.js'
@@ -13,6 +13,85 @@ function Disc({ title, children, defaultOpen = false }) {
         <IconCaret className="caret" />
       </button>
       {open && <div className="disc-body">{children}</div>}
+    </div>
+  )
+}
+
+/**
+ * 최신 크롬의 "오버레이 스크롤바"는 ::-webkit-scrollbar 를 무시하고 화면에
+ * 아무것도 그리지 않는다. 브라우저에 기대지 않고 항상 보이는 스크롤바를 직접 그린다.
+ */
+function GuideScroller({ children }) {
+  const colRef = useRef(null)
+  const [thumb, setThumb] = useState({ show: false, h: 100, top: 0 })
+
+  const recompute = () => {
+    const el = colRef.current
+    if (!el) return
+    const { scrollHeight, clientHeight, scrollTop } = el
+    if (scrollHeight <= clientHeight + 1) {
+      setThumb((t) => (t.show ? { show: false, h: 100, top: 0 } : t))
+      return
+    }
+    const h = Math.max(12, (clientHeight / scrollHeight) * 100)
+    const top = (scrollTop / (scrollHeight - clientHeight)) * (100 - h)
+    setThumb({ show: true, h, top })
+  }
+
+  useEffect(() => {
+    recompute()
+    const el = colRef.current
+    if (!el) return undefined
+    const ro = new ResizeObserver(recompute)
+    ro.observe(el)
+    // 아코디언을 여닫을 때도 내용 높이가 바뀌므로 다시 계산한다
+    const mo = new MutationObserver(recompute)
+    mo.observe(el, { childList: true, subtree: true })
+    window.addEventListener('resize', recompute)
+    return () => {
+      ro.disconnect()
+      mo.disconnect()
+      window.removeEventListener('resize', recompute)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onThumbPointerDown = (e) => {
+    e.preventDefault()
+    const el = colRef.current
+    const track = e.currentTarget.parentElement
+    if (!el || !track) return
+    const startY = e.clientY
+    const startScroll = el.scrollTop
+    const trackH = track.getBoundingClientRect().height
+    const thumbH = (trackH * thumb.h) / 100
+    const ratio = (el.scrollHeight - el.clientHeight) / Math.max(1, trackH - thumbH)
+
+    const onMove = (ev) => {
+      el.scrollTop = startScroll + (ev.clientY - startY) * ratio
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+
+  return (
+    <div className="letter-guide-wrap">
+      <div className="letter-guide-col" ref={colRef} onScroll={recompute}>
+        {children}
+      </div>
+      {thumb.show && (
+        <div className="guide-scrollbar-track" aria-hidden="true">
+          <div
+            className="guide-scrollbar-thumb"
+            style={{ height: `${thumb.h}%`, top: `${thumb.top}%` }}
+            onPointerDown={onThumbPointerDown}
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -79,7 +158,7 @@ export default function LetterWriter() {
       </div>
 
       <div className="letter-split">
-        <div className="letter-guide-col">
+        <GuideScroller>
           <div className="core-q">
             <span className="q-mark">핵심 질문</span>
             <p>{LETTER_SCAFFOLD.core}</p>
@@ -126,7 +205,7 @@ export default function LetterWriter() {
           <p className="caution">
             <b>잠깐!</b> {LETTER_SCAFFOLD.caution}
           </p>
-        </div>
+        </GuideScroller>
 
         <div className="letter-form-col">
           <form className="letter-form" onSubmit={handleSubmit}>

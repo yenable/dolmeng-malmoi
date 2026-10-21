@@ -48,17 +48,55 @@
   align-items: stretch;
 }
 
+.letter-guide-wrap {
+  position: relative;
+}
+
 .letter-guide-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
   max-height: min(66vh, 620px);
   overflow-y: auto;
-  padding-right: 6px;
-  scrollbar-width: thin;
+  padding-right: 18px;
+  /* 최신 크롬의 오버레이 스크롤바는 안 보이고 공간도 안 차지하므로,
+     아예 숨기고 바로 아래 커스텀 스크롤바(.guide-scrollbar-track)를 쓴다. */
+  scrollbar-width: none;
+}
+.letter-guide-col::-webkit-scrollbar {
+  display: none;
 }
 .letter-guide-col .core-q {
   margin-top: 0;
+}
+/* .disc는 overflow:hidden이라 flex가 내용 대신 박스 자체를 쪼그라뜨릴 수 있다.
+   자식들의 원래 크기를 지켜서 컬럼이 늘어나 스크롤되도록 고정한다. */
+.letter-guide-col > * {
+  flex-shrink: 0;
+}
+
+/* 항상 보이는 커스텀 스크롤바 */
+.guide-scrollbar-track {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 2px;
+  width: 7px;
+  border-radius: 999px;
+  background: var(--paper-deep);
+}
+.guide-scrollbar-thumb {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--ink-faint);
+  cursor: grab;
+  touch-action: none;
+}
+.guide-scrollbar-thumb:hover,
+.guide-scrollbar-thumb:active {
+  background: var(--ink-soft);
 }
 
 .letter-form-col {
@@ -191,6 +229,9 @@
     max-height: none;
     overflow-y: visible;
     padding-right: 0;
+  }
+  .guide-scrollbar-track {
+    display: none;
   }
   .letter-form .letter-body textarea {
     min-height: 220px;
