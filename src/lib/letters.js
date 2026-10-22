@@ -4,7 +4,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   updateDoc,
@@ -14,8 +13,6 @@ import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
 import { db, auth, googleProvider, ADMIN_EMAIL } from './firebase.js'
 
 const COL = 'letters'
-
-export const MIN_CHARS = 500
 
 export function countChars(text) {
   return (text || '').length
@@ -31,6 +28,18 @@ export async function submitLetter({ name, number, title, text }) {
     charCount,
     status: 'pending',
     createdAt: serverTimestamp(),
+  })
+}
+
+/** 글쓴이 본인(이 기기)이 제목·내용을 고친다. 다시 선생님 승인을 받아야 보드에 보인다. */
+export async function editLetter(id, { title, text }) {
+  const charCount = countChars(text)
+  return updateDoc(doc(db, COL, id), {
+    title: title.trim(),
+    text: text.trim(),
+    charCount,
+    status: 'pending',
+    editedAt: serverTimestamp(),
   })
 }
 

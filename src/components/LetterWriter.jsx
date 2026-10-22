@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { LETTER_SCAFFOLD, ACTIVITIES } from '../data/scaffolds.js'
 import { BOOKS } from '../data/books.js'
 import { useStore, setLetterDraft, markLetterSubmitted, resetLetter } from '../lib/storage.js'
-import { submitLetter, countChars, MIN_CHARS } from '../lib/letters.js'
+import { submitLetter, countChars } from '../lib/letters.js'
 import { IconCaret } from './Icons.jsx'
 
 /** 사전별 위저드에서 적어 둔 답을 그대로 보여 준다. 참고용이며 여기서는 고칠 수 없다. */
@@ -145,7 +145,7 @@ export default function LetterWriter() {
     draft.name.trim().length > 0 &&
     draft.number.trim().length > 0 &&
     draft.title.trim().length > 0 &&
-    chars >= MIN_CHARS
+    draft.text.trim().length > 0
 
   const field = (key) => ({
     value: draft[key],
@@ -279,9 +279,7 @@ export default function LetterWriter() {
             <label className="letter-body">
               <span className="letter-body-label">
                 2056년 친구들에게 쓰는 글
-                <span className={`letter-counter ${chars >= MIN_CHARS ? 'ok' : ''}`}>
-                  {chars} / {MIN_CHARS}자 이상
-                </span>
+                <span className={`letter-counter ${chars > 0 ? 'ok' : ''}`}>{chars}자</span>
               </span>
               <textarea
                 required
@@ -295,8 +293,8 @@ export default function LetterWriter() {
             <div className="letter-submit-row">
               <p className="letter-hint">
                 {ready
-                  ? '제출 준비가 되었어요. 제출 후에는 고치실 수 없으니 다시 한번 읽어 보세요.'
-                  : `이름·번호·제목을 채우고 ${MIN_CHARS}자 이상 써야 제출할 수 있어요.`}
+                  ? '제출 준비가 되었어요. 제출한 뒤에도 우리 반의 편지 모음에서 다시 고칠 수 있어요.'
+                  : '이름·번호·제목과 내용을 모두 채워야 제출할 수 있어요.'}
               </p>
               <button type="submit" className="btn solid" disabled={!ready || submitting}>
                 {submitting ? '제출하는 중…' : '선생님께 제출하기'}

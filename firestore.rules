@@ -9,7 +9,7 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
 
-    // 500자 이상 같은 정확한 글자 수 판정은 클라이언트(React)에서 한다.
+    // 글자 수 등 자세한 판정은 클라이언트(React)에서 한다.
     // 여기서는 악의적이거나 비정상적인 데이터만 막는 느슨한 안전망 역할만 한다.
     match /letters/{letterId} {
       allow read: if resource.data.status == 'approved' || isAdmin();
@@ -23,13 +23,28 @@ service cloud.firestore {
         request.resource.data.title is string &&
         request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 120 &&
         request.resource.data.text is string &&
-        request.resource.data.text.size() >= 30 && request.resource.data.text.size() <= 8000 &&
+        request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 8000 &&
         request.resource.data.charCount is int &&
         request.resource.data.createdAt == request.time;
 
-      // 관리자만 status를 바꿀 수 있다(승인/반려). 다른 필드는 손댈 수 없다.
-      allow update: if isAdmin() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedAt']);
+      // 관리자는 status를 바꿀 수 있다(승인/반려).
+      // 그 외에는 누구나(로그인 없음) 제목·내용만 고칠 수 있는데, 대신 반드시 다시 'pending'으로
+      // 돌아가 선생님 재승인을 받아야 한다 — 로그인이 없어 "글쓴이 본인"을 서버에서 증명할 수
+      // 없으므로, 수정은 항상 재검수를 거치게 해서 피해 범위를 "교사 승인 전 상태로 되돌리기"로 제한한다.
+      allow update: if isAdmin() ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['title', 'text', 'charCount', 'status', 'editedAt']) &&
+          request.resource.data.name == resource.data.name &&
+          request.resource.data.number == resource.data.number &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          request.resource.data.status == 'pending' &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 120 &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 8000 &&
+          request.resource.data.charCount is int
+        );
 
       allow delete: if isAdmin();
     }
