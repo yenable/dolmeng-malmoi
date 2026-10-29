@@ -1,11 +1,24 @@
-// 서버도 로그인도 없다. 읽던 위치·사전별 탐구 답변만 브라우저에 남긴다.
+// 로그인은 없다. 읽던 위치·사전별 탐구 답변을 브라우저에 남긴다.
+// (탐구 답변은 선생님이 볼 수 있도록 answers.js 가 Firestore 에도 따로 올린다.)
 import { useSyncExternalStore } from 'react'
 
 const KEY = 'dolmeng-malmoi:v1'
 
 const EMPTY_STORY = { word: '', s1: '', s2: '', s3: '', completedAt: null }
 
+/** 이 기기에서 지금 활동 중인 학생 한 명을 가리키는 무작위 id. 다른 학생으로 넘길 때 바뀐다. */
+function newSessionId() {
+  try {
+    return crypto.randomUUID().replace(/-/g, '')
+  } catch {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random()
+      .toString(36)
+      .slice(2)}`
+  }
+}
+
 const DEFAULTS = {
+  sessionId: null,
   lastBook: null,
   lastPage: {}, // bookId -> page
   prefs: {
@@ -31,11 +44,12 @@ const DEFAULTS = {
 function read() {
   try {
     const raw = localStorage.getItem(KEY)
-    if (!raw) return DEFAULTS
+    if (!raw) return { ...DEFAULTS, sessionId: newSessionId() }
     const parsed = JSON.parse(raw)
     return {
       ...DEFAULTS,
       ...parsed,
+      sessionId: parsed.sessionId || newSessionId(),
       prefs: { ...DEFAULTS.prefs, ...(parsed.prefs || {}) },
       storyAnswers: {
         goyueo: { ...EMPTY_STORY, ...(parsed.storyAnswers?.goyueo || {}) },
@@ -49,7 +63,7 @@ function read() {
       },
     }
   } catch {
-    return DEFAULTS
+    return { ...DEFAULTS, sessionId: newSessionId() }
   }
 }
 
@@ -66,12 +80,12 @@ function commit(next) {
   listeners.forEach((l) => l())
 }
 
-function subscribe(l) {
+export function subscribe(l) {
   listeners.add(l)
   return () => listeners.delete(l)
 }
 
-function getSnapshot() {
+export function getSnapshot() {
   return state
 }
 
@@ -131,12 +145,17 @@ export function markLetterSubmitted(id) {
 
 /** 같은 기기를 다른 학생이 이어서 쓸 때 초안과 제출 상태를 비운다. */
 export function resetLetter() {
-  commit({ ...state, letter: { ...DEFAULTS.letter, draft: { ...DEFAULTS.letter.draft } } })
+  commit({
+    ...state,
+    sessionId: newSessionId(),
+    letter: { ...DEFAULTS.letter, draft: { ...DEFAULTS.letter.draft } },
+  })
 }
 
 export function resetAll() {
   commit({
     ...DEFAULTS,
+    sessionId: newSessionId(),
     prefs: { ...DEFAULTS.prefs },
     storyAnswers: {
       goyueo: { ...EMPTY_STORY },

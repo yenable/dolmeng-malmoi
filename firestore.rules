@@ -48,5 +48,31 @@ service cloud.firestore {
 
       allow delete: if isAdmin();
     }
+
+    // 사전별 "~에 담긴 이야기" 답변. 학생 기기마다 무작위 id 문서 하나를 계속 덮어쓴다.
+    // 읽기·목록은 선생님만. id 는 추측할 수 없는 무작위 값이라 남의 문서를 찾아 덮어쓰기 어렵다.
+    function shortStr(v, max) {
+      return v is string && v.size() <= max;
+    }
+    function validBook(b) {
+      return b is map &&
+        b.keys().hasOnly(['word', 's1', 's2', 's3', 'completedAt']) &&
+        shortStr(b.word, 2000) && shortStr(b.s1, 2000) &&
+        shortStr(b.s2, 2000) && shortStr(b.s3, 2000) &&
+        (b.completedAt == null || b.completedAt is int);
+    }
+    function validAnswers(d) {
+      return d.keys().hasOnly(['name', 'number', 'books', 'updatedAt']) &&
+        shortStr(d.name, 40) && shortStr(d.number, 10) &&
+        d.books is map &&
+        d.books.keys().hasOnly(['goyueo', 'jiyeogeo', 'hyundaeeo']) &&
+        validBook(d.books.goyueo) && validBook(d.books.jiyeogeo) && validBook(d.books.hyundaeeo) &&
+        d.updatedAt == request.time;
+    }
+
+    match /storyAnswers/{sessionId} {
+      allow read, delete: if isAdmin();
+      allow create, update: if sessionId.size() >= 16 && validAnswers(request.resource.data);
+    }
   }
 }

@@ -299,3 +299,108 @@
   gap: 8px;
   margin-top: 2px;
 }
+
+/* ── 관리자 탭: 편지 승인 / 사전 답변 ─────────────────────────── */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+.admin-tabs button {
+  border: none;
+  background: none;
+  padding: 10px 14px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.admin-tabs button:hover {
+  color: var(--ink-soft);
+}
+.admin-tabs button[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.ans-filter {
+  padding: 0 0 14px;
+  border-bottom: none;
+}
+.ans-count {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+.ans-who {
+  font-size: 15px;
+  color: var(--ink);
+}
+.ans-noname {
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+.ans-books {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ans-book {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.ans-book-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.ans-badge {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 8px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-faint);
+}
+.ans-badge.done {
+  color: #2f6a43;
+  background: #e9f3ec;
+  border-color: #bcdcc6;
+}
+.ans-empty {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.ans-book.empty .ans-book-title {
+  margin-bottom: 2px;
+}
+
+.ans-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ans-row dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.ans-row dd {
+  margin: 2px 0 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.ans-row dd.ans-word {
+  font-weight: 800;
+}

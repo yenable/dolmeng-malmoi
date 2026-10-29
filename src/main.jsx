@@ -2,6 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App.jsx'
+import { startAnswerSync } from './lib/answers.js'
 
 import './styles/base.css'
 import './styles/splash.css'
@@ -12,6 +13,8 @@ import './styles/classmode.css'
 import './styles/closing.css'
 import './styles/letter.css'
 import './styles/admin.css'
+
+startAnswerSync()
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
